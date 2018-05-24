@@ -33,17 +33,20 @@ vector<int> g[N];
 int p[N];
 int ans;
 int tmr, mt[N], tm[N], used[N];
-map<int, int> hw;
+int hw[N];
 vector<int> L, R;
 
 inline void add(int val) {
     int x = val, parity = 0;
     vector<int> v;
-    while(x > 1) { v.pb(val / lp[x]), x /= lp[x], parity ^= 1; }
-    sort(v.begin(), v.end()); v.resize(unique(v.begin(), v.end()) - v.begin());
+    while(x > 1) {
+        int d = lp[x];
+        v.pb(val / d);
+        while(x % d == 0) x/= d, parity ^= 1;
+    }
     for(int i = 0, to; i < v.size(); ++i) {
         to = v[i];
-        if(!hw.count(to)) continue;
+        if(!hw[to]) continue;
         int x = hw[val], y = hw[to];
         if(!parity) swap(x, y);
         g[x].pb(y);
@@ -62,7 +65,7 @@ inline bool dfs(int v) {
 
 inline void solve(int test) {
     cin >> n;
-    hw.clear(); L.clear(); R.clear();
+    L.clear(); R.clear();
     fo(i, n) cin >> a[i], hw[a[i]] = i, g[i].clear();
     fo(i, n) add(a[i]), mt[i] = tm[i] = -1, used[i] = 0;
     tmr = 0, ans = n;
@@ -72,6 +75,7 @@ inline void solve(int test) {
             if(!p[i] && tm[i] == -1 && dfs(i)) run = 1, --ans;
     }
     print(test, ans);
+    fo(i, n) hw[a[i]] = 0;
 }
 
 int main() {
